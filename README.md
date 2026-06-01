@@ -1,12 +1,14 @@
 # Buffaly Installer
 
-Public installer releases for Buffaly runtime packages.
+Public release artifacts for installing Buffaly on Windows.
 
-Buffaly is a field-tested runtime for high-trust agents, developed by Matt Furnari. The source is available under the `buffaly-ai` GitHub organization for inspection, debugging, plugin/tool development, partner integration, and LLM-assisted understanding.
+This repository is distribution-only for built Buffaly MSI installer artifacts. It does not contain installer build source code, packaging scripts, or the private installer build system. The installer source and build packaging code are not public.
+
+Buffaly is a runtime for high-trust agents. Public Buffaly component and documentation repositories are available under the `buffaly-ai` GitHub organization for inspection, debugging, plugin/tool development, partner integration, and LLM-assisted understanding where those repositories are public.
 
 ## Recommended install path
 
-For most users, start with the latest installer release instead of building every repository from source.
+For most users, start with the latest MSI release artifact.
 
 1. Open the latest release:
    https://github.com/buffaly-ai/buffaly-installer/releases/latest
@@ -16,14 +18,13 @@ For most users, start with the latest installer release instead of building ever
 
 ## Source repositories
 
-Start with the docs/source map:
+This repository does not provide installer build source. For public Buffaly runtime/component source and documentation, start with the docs/source map:
 
 - https://buffa.ly/docs
 - https://github.com/buffaly-ai
 
-Important source repos:
+Relevant public component repositories may include:
 
-- `buffaly-development` - main runtime source, agent host, typed tools, session services, web/worker hosts, and ProtoScript integration.
 - `protoscript` - executable language for prototype graphs and typed actions.
 - `ontology` - prototype graph runtime foundation.
 - `buffaly-providers` - provider contracts and model-provider modules.
@@ -37,8 +38,8 @@ The installer package is intended to be public. Runtime secrets must be supplied
 
 ## Licensing
 
-Buffaly core is GPLv3 by default. If your organization needs different terms for proprietary use, redistribution, or supported deployment, contact us for commercial licensing.
+Use of the distributed installer is subject to the applicable terms for the Buffaly components it installs. Buffaly runtime/core components are GPLv3 by default unless separately commercially licensed. Public source and component license details can be reviewed in the relevant `buffaly-ai` repositories and documentation.
 
-Buffaly is developed by Matt Furnari.
+If your organization needs different terms for proprietary use, redistribution, or supported deployment, contact us for commercial licensing.
 
 Commercial licensing inquiries can be opened as GitHub issues using the `commercial-licensing` label/template in the relevant repository.
