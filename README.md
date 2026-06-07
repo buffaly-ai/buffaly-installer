@@ -49,7 +49,7 @@ sha256sum -c buffaly-linux-x64-<version>.sha256
 ```bash
 tar -xzf buffaly-linux-x64-<version>.tar.gz
 cd buffaly-linux-x64-<version>
-./scripts/install.sh \
+bash ./scripts/install.sh \
   --install-root "$HOME/buffaly" \
   --port 5088 \
   --auth none \
