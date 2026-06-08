@@ -21,6 +21,22 @@ release-manifest.json
 
 Future Linux variants may add `buffaly-linux-arm64-<version>.tar.gz` after the x64 tarball flow is stable.
 
+The first Mac developer-preview artifact is staged for GitHub Releases as a command-line package, not a graphical installer. It requires an external SQL Server 2025 database endpoint reachable from the Mac. The Mac package must not reuse private evaluation database names, production database names, or existing SQL logins unless the operator explicitly chooses to attach that install to existing state.
+
+Expected Mac developer-preview release asset names:
+
+```text
+buffaly-mac-arm64-phase1-dev-20260608003948.zip
+buffaly-mac-arm64-phase1-dev-20260608003948.sha256
+release-manifest.json
+```
+
+Validated Mac developer-preview checksum:
+
+```text
+aa52376eec44790e26b46e64367e67f17fea4d9c4019e6dd122d8f4c48881add  buffaly-mac-arm64-phase1-dev-20260608003948.zip
+```
+
 ## Recommended install path
 
 Open the latest release:
@@ -75,6 +91,79 @@ Linux MVP defaults:
 
 Do not reuse or alter existing Buffaly SQL logins for Linux installs.
 
+### Mac developer preview
+
+The Mac Phase 1 package is for Apple Silicon (`osx-arm64`) and uses command-line install/update scripts. It is not a `.pkg` or graphical installer yet.
+
+Prerequisites:
+
+- Apple Silicon Mac.
+- External SQL Server 2025 endpoint reachable from the Mac. SQL Server does not need to run on the Mac.
+- A dedicated SQL login and dedicated Buffaly sessions/semantic databases for this Mac install, unless the operator intentionally attaches to existing Buffaly state.
+- macOS Terminal access.
+
+1. Download `buffaly-mac-arm64-phase1-dev-20260608003948.zip` and its checksum file.
+2. Verify the checksum:
+
+```bash
+shasum -a 256 buffaly-mac-arm64-phase1-dev-20260608003948.zip
+```
+
+Expected checksum:
+
+```text
+aa52376eec44790e26b46e64367e67f17fea4d9c4019e6dd122d8f4c48881add
+```
+
+3. Extract and install:
+
+```bash
+unzip buffaly-mac-arm64-phase1-dev-20260608003948.zip -d buffaly-mac-arm64-phase1-dev-20260608003948
+cd buffaly-mac-arm64-phase1-dev-20260608003948
+chmod +x ./scripts/*.sh
+./scripts/install-mac.sh \
+  --install-root "$HOME/buffaly-mac" \
+  --port 5090 \
+  --auth none \
+  --sql-host <sql-server-host> \
+  --sql-port 1433 \
+  --sql-login <dedicated-buffaly-sql-login> \
+  --sql-password '<password>' \
+  --sessions-db <dedicated-sessions-database> \
+  --semantic-db <dedicated-semantic-database> \
+  --sign-mode adhoc \
+  --no-validate
+```
+
+4. Start and validate:
+
+```bash
+$HOME/buffaly-mac/scripts/buffaly-start.sh --install-root "$HOME/buffaly-mac"
+$HOME/buffaly-mac/scripts/validate.sh --install-root "$HOME/buffaly-mac" --port 5090
+```
+
+5. Open:
+
+```text
+http://127.0.0.1:5090/buffaly-agent.html
+```
+
+Mac developer-preview defaults and limitations:
+
+- command-line install flow only;
+- no-auth mode is supported with `--auth none` for private/dev networks;
+- external SQL Server 2025 is the supported Phase 1 database mode;
+- package uses ad-hoc signing for development validation;
+- public Developer ID signing and notarization are not complete yet;
+- launchd support is scaffolded but still needs reboot/logout validation before public guidance treats it as production-ready;
+- updater scripts are scaffolded, but rollback/signature hardening remains future work.
+
+Website/docs handoff notes:
+
+- Website download buttons should link to GitHub Release assets in this repository rather than hosting binaries separately.
+- Public docs should describe generic SQL Server 2025 requirements and dedicated database/login guidance only.
+- Public docs must not include private evaluation database names, private SQL login names, private passwords, Tailscale hostnames, or private validation IPs.
+- The Mac docs should clearly label this as a developer-preview command-line package until Developer ID signing, notarization, and the production installer flow are complete.
 ## Source repositories
 
 This repository does not provide installer build source. For public Buffaly runtime/component source and documentation, start with the docs/source map:
