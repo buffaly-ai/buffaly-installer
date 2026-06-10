@@ -37,9 +37,34 @@ Validated Mac developer-preview checksum:
 aa52376eec44790e26b46e64367e67f17fea4d9c4019e6dd122d8f4c48881add  buffaly-mac-arm64-phase1-dev-20260608003948.zip
 ```
 
+
+## Platform release channels
+
+Windows keeps the repository-wide GitHub latest channel because the public website and installed Windows updater depend on these URLs:
+
+```text
+https://github.com/buffaly-ai/buffaly-installer/releases/latest/download/BuffalyInstallerLatest.msi
+https://github.com/buffaly-ai/buffaly-installer/releases/latest/download/BuffalyUpdateManifestLatest.json
+```
+
+Mac and Linux packages must not use or change repository-wide latest. They are published to versioned prerelease tags for provenance and mutable platform prerelease channel tags for stable downloads.
+
+Linux x64 channel:
+
+```text
+https://github.com/buffaly-ai/buffaly-installer/releases/download/linux-latest/buffaly-linux-x64-latest.tar.gz
+https://github.com/buffaly-ai/buffaly-installer/releases/download/linux-latest/buffaly-linux-x64-latest.sha256
+```
+
+Mac arm64 channel:
+
+```text
+https://github.com/buffaly-ai/buffaly-installer/releases/download/mac-latest/buffaly-osx-arm64-latest.tar.gz
+https://github.com/buffaly-ai/buffaly-installer/releases/download/mac-latest/buffaly-osx-arm64-latest.sha256
+```
 ## Recommended install path
 
-Open the latest release:
+For Windows, use the repository-wide latest release. For Mac/Linux, use the platform channel URLs above.
 
 ```text
 https://github.com/buffaly-ai/buffaly-installer/releases/latest
@@ -191,3 +216,4 @@ Use of the distributed installer is subject to the applicable terms for the Buff
 If your organization needs different terms for proprietary use, redistribution, or supported deployment, contact us for commercial licensing.
 
 Commercial licensing inquiries can be opened as GitHub issues using the `commercial-licensing` label/template in the relevant repository.
+
