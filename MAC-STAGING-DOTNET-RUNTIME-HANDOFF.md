@@ -27,12 +27,15 @@ Temporary runtime source:
 /Users/matthewfurnari/buffaly-mac/dotnet
 ```
 
-Created local runtime scripts:
+Created local runtime scripts and wrapper:
 
 ```text
 /Users/matthewfurnari/buffaly-newinstall-staging-20260611_232155/scripts/start-staging-with-dotnet9.sh
 /Users/matthewfurnari/buffaly-newinstall-staging-20260611_232155/scripts/recycle-staging-with-dotnet9.sh
+/Users/matthewfurnari/buffaly-newinstall-staging-20260611_232155/bin/pwsh
 ```
+
+The `bin/pwsh` wrapper intentionally overrides inherited `DOTNET_ROOT=/Users/matthewfurnari/buffaly-mac/dotnet` with `DOTNET_ROOT=/opt/homebrew/opt/dotnet/libexec` before execing `/opt/homebrew/bin/pwsh`, because the local Homebrew PowerShell requires .NET 10.
 
 Created local LaunchAgent:
 
@@ -40,11 +43,11 @@ Created local LaunchAgent:
 /Users/matthewfurnari/Library/LaunchAgents/com.buffaly.agent.staging.5108.plist
 ```
 
-The LaunchAgent pins:
+The LaunchAgent pins Buffaly child-tool `dotnet` resolution to .NET 9, while placing a staging-local `pwsh` wrapper first so PowerShell can restore Homebrew .NET 10 before launch:
 
 ```text
 DOTNET_ROOT=/Users/matthewfurnari/buffaly-mac/dotnet
-PATH=/Users/matthewfurnari/buffaly-mac/dotnet:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+PATH=/Users/matthewfurnari/buffaly-newinstall-staging-20260611_232155/bin:/Users/matthewfurnari/buffaly-mac/dotnet:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 BUFFALY_INSTALL_ROOT=/Users/matthewfurnari/buffaly-newinstall-staging-20260611_232155
 DOTNET_ENVIRONMENT=Production
 ASPNETCORE_URLS=http://127.0.0.1:5108/
@@ -56,6 +59,7 @@ Validation after recycle:
 - `http://127.0.0.1:5108/buffaly-agent.html` returns HTTP 200.
 - Running web process loads runtime files from `/Users/matthewfurnari/buffaly-mac/dotnet/shared/Microsoft.NETCore.App/9.0.17`.
 - Process environment includes the pinned `DOTNET_ROOT`, `PATH`, `BUFFALY_INSTALL_ROOT`, and `ASPNETCORE_URLS` values above.
+- With staging PATH, `pwsh` resolves to the staging wrapper and reports `DOTNET_ROOT=/opt/homebrew/opt/dotnet/libexec`; `dotnet` resolves to `/Users/matthewfurnari/buffaly-mac/dotnet/dotnet` and lists .NET 9.0.17 runtimes.
 
 ## Required long-term installer fix
 
@@ -80,7 +84,7 @@ Implement the following:
    DOTNET_ENVIRONMENT=Production
    ```
 
-3. Ensure `agent-web`, spawned `agent-worker` processes, and tool/harness child processes inherit those variables.
+3. Ensure `agent-web`, spawned `agent-worker` processes, and tool/harness child processes inherit those variables. If the installer includes or expects tools such as Homebrew `pwsh` that require a different runtime major version, generate explicit wrappers for those executables rather than changing the global Buffaly `DOTNET_ROOT`.
 
 4. Do not rely on Homebrew/system `dotnet` for Buffaly runtime execution. Homebrew may contain only .NET 10 while Buffaly currently targets `net9.0`.
 
@@ -104,7 +108,7 @@ Implement the following:
    <install-root>/dotnet/shared/Microsoft.NETCore.App/...
    ```
 
-7. Add installer regression coverage for this scenario: launching a `net9.0` Buffaly tool/harness must succeed even when `/opt/homebrew/bin/dotnet` is .NET 10-only.
+7. Add installer regression coverage for this scenario: launching a `net9.0` Buffaly tool/harness must succeed even when `/opt/homebrew/bin/dotnet` is .NET 10-only, and launching `pwsh` must succeed when PowerShell requires the Homebrew .NET 10 runtime.
 
 ## Acceptance criteria
 
@@ -113,4 +117,5 @@ Implement the following:
 - Generated LaunchAgent starts `agent-web` with install-local `DOTNET_ROOT` and `PATH`.
 - `agent-web`, `agent-worker`, and tool child processes inherit install-local runtime environment.
 - A `net9.0` tool/harness launch succeeds on a machine whose Homebrew/system dotnet is .NET 10-only.
+- `pwsh` launch succeeds even when Buffaly child processes use a .NET 9 `DOTNET_ROOT`, via an installer-generated wrapper or equivalent process-specific environment isolation.
 - No new staging install depends on `/Users/matthewfurnari/buffaly-mac/dotnet`.
